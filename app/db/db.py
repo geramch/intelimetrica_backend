@@ -1,6 +1,7 @@
 import os
-
+import uuid
 import pytz
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -11,25 +12,14 @@ from sqlalchemy import (
     create_engine, ForeignKey, Float,
 )
 
+from app.db.utils import Base
+
 TIME_ZONE = pytz.timezone("America/Mexico_City")
-
-POSTGRESQL_URL = os.getenv("POSTGRESQL_URL")
-print(POSTGRESQL_URL)
-
-if POSTGRESQL_URL is None:
-    raise ValueError("The POSTGRESQL_URL environment variable is not set.")
-
-
-engine = create_engine(
-    POSTGRESQL_URL
-)
-
-Base = declarative_base()
 
 class Restaurant(Base):
     __tablename__ = 'restaurants'
 
-    id = Column(String, primary_key=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     rating = Column(Integer)
     name = Column(String)
     site = Column(String)
@@ -40,3 +30,18 @@ class Restaurant(Base):
     state = Column(String)
     lat = Column(Float)
     lng = Column(Float)
+
+    def to_dict(self):
+        return {
+            'id': str(self.id),
+            'rating': self.rating,
+            'name': self.name,
+            'site': self.site,
+            'email': self.email,
+            'phone': self.phone,
+            'street': self.street,
+            'city': self.city,
+            'state': self.state,
+            'lat': self.lat,
+            'lng': self.lng
+        }
