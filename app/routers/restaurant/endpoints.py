@@ -25,7 +25,7 @@ def read_restaurants(skip: int = 0, limit: int = 10, db: Session = Depends(get_d
     return crud_restaurant.get_all(db=db, skip=skip, limit=limit)
 
 
-@router.get("/{restaurant_id}", response_model=RestaurantResponse)
+@router.get("/single/{restaurant_id}", response_model=RestaurantResponse)
 def read_restaurant(restaurant_id: str, db: Session = Depends(get_db)):
     restaurant = crud_restaurant.get(db=db, restaurant_id=restaurant_id)
     if restaurant is None:
@@ -60,3 +60,10 @@ def upload_csv(file: UploadFile = File(...), db: Session = Depends(get_db)):
         crud_restaurant.create(db=db, restaurant=restaurant)
 
     return {"message": "CSV data uploaded successfully"}
+
+@router.get("/statistics")
+def read_restaurant(latitude: float, longitude: float, radius: float, db: Session = Depends(get_db)):
+    restaurant = crud_restaurant.get_restaurants_within_radius(db=db, lat=latitude, lng=longitude, radius=radius)
+    if restaurant is None:
+        raise HTTPException(status_code=404, detail="Restaurant not found")
+    return restaurant

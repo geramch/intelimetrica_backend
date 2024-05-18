@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:15
+    image: postgis/postgis
     environment:
       POSTGRES_DB: restaurants
       POSTGRES_PASSWORD: restaurants12-
@@ -20,4 +20,5 @@ services:
     volumes:
       - .:/app
     depends_on:
-      - db
+      db:
+        condition: service_healthy
